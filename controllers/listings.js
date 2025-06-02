@@ -47,9 +47,15 @@ module.exports.createListing = async (req, res, next) => {
       limit: 1,
     })
     .send();
-
-  let url = req.file.path;
-  let filename = req.file.filename;
+  let url, filename;
+  if (req.file) {
+    url = req.file.path;
+    filename = req.file.filename;
+  } else {
+    url =
+      "https://res.cloudinary.com/dwr0ap0ps/image/upload/v1748712847/sample_listing_image_qrzns3.jpg";
+    filename = "default_hotel";
+  }
   const newListing = new Listing(req.body.listing);
   newListing.owner = req.user._id;
   newListing.image = { url, filename };
