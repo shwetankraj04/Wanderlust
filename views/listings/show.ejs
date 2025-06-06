@@ -1,3 +1,8 @@
+<p>Current User ID: <%= currUser ? currUser._id : "No user logged in" %></p>
+<p>Current User isAdmin: <%= currUser ? currUser.isAdmin : "N/A" %></p>
+<p>Listing Owner ID: <%= listing.owner._id %></p>
+<p>isAdmin: <%= currUser ? currUser.isAdmin : 'No user' %></p>
+
 <% layout("/layouts/boilerplate") %>
 <script>
   const mapToken = "<%= process.env.MAP_TOKEN %>";
@@ -28,7 +33,8 @@
           <p class="card-text">🌍 <%= listing.country %></p>
         </div>
 
-        <% if (currUser && currUser._id.equals(listing.owner._id)) { %>
+        <% if ( currUser && (listing.owner._id.toString() ===
+        currUser._id.toString() || currUser.isAdmin) ) { %>
         <div
           class="card-footer bg-white border-0 d-flex justify-content-between p-3"
         >

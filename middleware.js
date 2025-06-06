@@ -19,15 +19,17 @@ module.exports.saveRedirectUrl = (req, res, next) => {
   next();
 };
 
-module.exports.isOwner = async (req, res, next) => {
-  let { id } = req.params;
-  let listing = await Listing.findById(id);
-  if (!listing.owner.equals(res.locals.currUser._id)) {
-    req.flash("error", "You aren't the owner of this listing");
-    return res.redirect(`/listings/${id}`);
+module.exports.isOwnerOrAdmin = async (req, res, next) => {
+  const { id } = req.params;
+  const listing = await Listing.findById(id);
+  if (
+    listing.owner.equals(res.locals.currUser._id) ||
+    res.locals.currUser.isAdmin
+  ) {
+    return next();
   }
-
-  next();
+  req.flash("error", "You do not have permission to do that.");
+  return res.redirect(`/listings/${id}`);
 };
 
 module.exports.validateListing = (req, res, next) => {
@@ -60,3 +62,19 @@ module.exports.isReviewAuthor = async (req, res, next) => {
 
   next();
 };
+
+const multer = require("multer");
+const { storage } = require("./cloudConfig");
+
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only .jpg, .jpeg, and .png files are allowed!"), false);
+  }
+};
+
+const upload = multer({ storage, fileFilter });
+
+module.exports.upload = upload;

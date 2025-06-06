@@ -46,7 +46,10 @@
 
         <div class="mb-3">
           <label for="image" class="form-label">Upload New Image</label>
-          <input type="file" name="listing[image]" class="form-control" />
+          <input type="file" name="listing[image]" class="form-control" accept=".jpg, .jpeg, .png" />
+          <div class="form-text text-muted">
+          Files supported: <strong>.jpg, .jpeg, .png</strong> only.
+        </div>
         </div>
 
         <div class="row">
@@ -76,7 +79,7 @@
         </div>
 
         <div class="mb-3">
-          <label for="location" class="form-label">Location</label>
+          <label for="location" class="form-label">Location(City)</label>
           <input
             type="text"
             name="listing[location]"

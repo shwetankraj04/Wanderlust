@@ -2,11 +2,15 @@ const express = require("express");
 const router = express.Router();
 const wrapAsync = require("../utils/wrapAsync.js");
 const Listing = require("../models/listing.js");
-const { isLoggedIn, isOwner, validateListing } = require("../middleware.js");
+const {
+  isLoggedIn,
+  isOwnerOrAdmin,
+  validateListing,
+  upload,
+} = require("../middleware.js");
 const listingController = require("../controllers/listings.js");
 const multer = require("multer");
 const { storage } = require("../cloudConfig.js");
-const upload = multer({ storage });
 
 router.get("/search", wrapAsync(listingController.searchListings));
 
@@ -15,7 +19,15 @@ router
   .get(wrapAsync(listingController.index))
   .post(
     isLoggedIn,
-    upload.single("listing[image]"),
+    (req, res, next) => {
+      upload.single("listing[image]")(req, res, function (err) {
+        if (err) {
+          req.flash("error", err.message);
+          return res.redirect("/listings/new"); // Redirect back to the form page
+        }
+        next();
+      });
+    },
     validateListing,
     wrapAsync(listingController.createListing)
   );
@@ -28,18 +40,30 @@ router
   .get(wrapAsync(listingController.showListing))
   .put(
     isLoggedIn,
-    isOwner,
-    upload.single("listing[image]"),
+    isOwnerOrAdmin,
+    (req, res, next) => {
+      upload.single("listing[image]")(req, res, function (err) {
+        if (err) {
+          req.flash("error", err.message);
+          return res.redirect(`/listings/${req.params.id}/edit`);
+        }
+        next();
+      });
+    },
     validateListing,
     wrapAsync(listingController.updateListing)
   )
-  .delete(isLoggedIn, isOwner, wrapAsync(listingController.destroyListing));
+  .delete(
+    isLoggedIn,
+    isOwnerOrAdmin,
+    wrapAsync(listingController.destroyListing)
+  );
 
 //Edit Route
 router.get(
   "/:id/edit",
   isLoggedIn,
-  isOwner,
+  isOwnerOrAdmin,
   wrapAsync(listingController.renderEditForm)
 );
 
