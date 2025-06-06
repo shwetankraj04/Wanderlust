@@ -1,8 +1,3 @@
-<p>Current User ID: <%= currUser ? currUser._id : "No user logged in" %></p>
-<p>Current User isAdmin: <%= currUser ? currUser.isAdmin : "N/A" %></p>
-<p>Listing Owner ID: <%= listing.owner._id %></p>
-<p>isAdmin: <%= currUser ? currUser.isAdmin : 'No user' %></p>
-
 <% layout("/layouts/boilerplate") %>
 <script>
   const mapToken = "<%= process.env.MAP_TOKEN %>";
